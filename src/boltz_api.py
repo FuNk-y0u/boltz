@@ -3,10 +3,10 @@ import threading
 import shutil
 import json
 
-from util import *
-from config import *
+from src.util import *
+from src.config import *
 
-from spotify_dl import spotify_dl
+from src.spotify_dl import spotify_dl
 import sys
 import os
 
@@ -57,44 +57,37 @@ class spotify_download_api:
         self.pyutil.log_warning("checking for validity of link")
         if(not (self.playListlink.startswith('https://open.spotify.com/playlist/'))):
             self.pyutil.log_error("sorry invalid link!")
+            return "invlink"
         else:
         # Starting Download Thread
-            self.download_thread(self.playListlink, self.isZip, self.current_id)
+            try:
+                self.pyutil.log_warning("Attempting to download songs from " + self.playListlink)
 
-    def download_thread(self, link, c_zip, c_id):
-        self.c_id = c_id
-        self.link = link
-        self.c_zip = c_zip
-        try:
-            self.pyutil.log_warning("Attempting to download songs from " + self.playListlink)
+                # updating id file
+                self.current_id = self.current_id + 1
+                id_file = open("temp/current_id.txt", "w")
+                id_file.write(str(self.current_id))
+                id_file.close()
 
-            # updating id file
-            self.current_id = self.current_id + 1
-            id_file = open("temp/current_id.txt", "w")
-            id_file.write(str(self.current_id))
-            id_file.close()
-
-            # downloading using spotify_dl
-            #os.system(f'spotify_dl -l "{self.link}" -o {TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.c_id)}/')
-
-            sys.argv.append("-l")
-            sys.argv.append(self.link)
-            sys.argv.append("-o")
-            sys.argv.append(f'{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.c_id)}/')
-            spotify_dl.spotify_dl()
+                sys.argv.append("-l")
+                sys.argv.append(self.playListlink)
+                sys.argv.append("-o")
+                sys.argv.append(f'{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.current_id)}/')
+                spotify_dl.spotify_dl()
 
 
-            if(c_zip):
-                shutil.make_archive(f"{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}zips/{str(self.c_id)}", format='zip', root_dir = f"{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.c_id)}/")
-                shutil.rmtree(f"{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.c_id)}/")
+                if(self.isZip):
+                    shutil.make_archive(f"{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}zips/{str(self.current_id)}", format='zip', root_dir = f"{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.current_id)}/")
+                    shutil.rmtree(f"{TEMP_FOLDER_LOCATION + DOWNLOADS_FOLDER}{str(self.current_id)}/")
+                    return (str(self.current_id))
 
-            self.pyutil.log_ok("Sucessfully downloaded")
+                self.pyutil.log_ok("Sucessfully downloaded")
 
 
-        except Exception as e:
-            self.pyutil.log_warning("couldnot download playlist")
-            self.pyutil.display_error(str(e))
-            return 0
+            except Exception as e:
+                self.pyutil.log_warning("couldnot download playlist")
+                self.pyutil.display_error(str(e))
+        
 
 if __name__ == '__main__':
     config = json.load(open("config.json", "r"))

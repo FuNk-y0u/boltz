@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+
+{% block script %}
+
+function doSomething() {
+    var x = document.getElementById("link_box").value;
+    if(x.startsWith("https://open.spotify.com/playlist/"))
+    {
+        alert('Your playlist is being processed please stay in the page until we redirect u to the download page');
+        document.getElementById("load").style.display = "block";
+    }
+    else{
+        alert('The link you have provided is incorrect please try again');
+    }
+
+}
+{% endblock %}
+
+
+{% block content %}
+<form onsubmit="doSomething()" method="get" class="text-white nav justify-content-center m-3">
+    <p>Your Spotify PLaylist Link:</p>
+    <input id = "link_box" type="text" class="form-control" name="pl_link" placeholder="https://open.spotify.com/playlist/...">
+    <input id = "btn"type="submit" class="nav justify-content-center m-3" value  ="submit" style="width: 20%; height: 80%; border-radius: 20px; background-color: #bd93f9; border: none; margin: 10px;"/>
+</form>
+<center><div id = "load"class="lds-ellipsis" style="display: none;"><div></div><div></div><div></div><div></div></div></center>
+{% endblock %}
