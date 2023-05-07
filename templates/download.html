@@ -1,0 +1,97 @@
+<html>
+    <head>
+        <script>
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+            async function req_info(){
+                await sleep(3000);
+
+                let running = true;
+                let prev_song = '#';
+                let count = 1;
+
+                while(running){
+                    var token = "{{file_token}}"
+                    var server_ip_tmp = 'http://{{server_ip}}'
+                    var server_ip = 'http://{{server_ip}}/get'
+
+                    let response = await fetch(server_ip,
+                    {
+                        method: "POST",
+                        body:JSON.stringify(token)
+                    });
+
+                    let data = await response.text();
+                    console.log(data);
+                    data = JSON.parse(data)
+
+                    var id1 = document.getElementById("totalprogress");
+                    id1.innerText = data.total_progress + "%";
+
+                    
+                    var id2 = document.getElementById(data.current_song);
+                    if(id2 == null)
+                    {
+
+                        if(prev_song == '#')
+                        {
+                            prev_song = data.current_song;
+                        }
+
+                        if(prev_song == data.current_song)
+                        {
+                            const sdiv = document.getElementById("songlist");
+                            const song = document.createElement("H1");
+
+                            song.setAttribute('id',data.current_song);
+                            if(data.is_complete != true){
+                                song_name = document.createTextNode(data.current_song + " [PROCESSING]");
+                                song.append(song_name);
+
+                                sdiv.appendChild(song);
+                            }
+                        }
+                        else
+                        {
+                            const song_prev_div = document.getElementById(prev_song);
+                            song_prev_div.innerHTML = prev_song + " [COMPLETED]";
+                            prev_song = data.current_song;
+                        }
+
+                    }
+                    else{
+                        if(data.is_complete == true)
+                        {
+                            const song_prev_div = document.getElementById(data.current_song);
+                            song_prev_div.innerHTML = data.current_song + " [COMPLETED]";
+
+                            const info_h1 = document.getElementById("info");
+                            info_h1.innerHTML = "Your conversion is complete please wait 3s while we redirect you"
+
+                            await sleep(3000);
+                            window.location.replace(server_ip_tmp  + '/download/' + token);
+                            break;
+                        }
+                    }
+                    await sleep(1000);
+                }
+                
+            }
+            window.onload = req_info;
+        </script>
+    </head>
+    <h1>
+        downloading shit
+    </h1>
+    <h1>
+        total progress:
+    </h1>
+    <h1 id = "totalprogress"></h1>
+
+    <div id = "songlist"></div>
+
+    <h1 id = "info"></h1>
+
+    <a href="#"></a>
+</html>
