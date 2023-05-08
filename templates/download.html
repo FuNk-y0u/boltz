@@ -11,8 +11,8 @@
         let count = 1;
         while(running){
             var token = "{{file_token}}"
-            var server_ip_tmp = 'http://{{server_ip}}'
-            var server_ip = 'http://{{server_ip}}/get'
+            var server_ip_tmp = '{{server_ip}}'
+            var server_ip = '{{server_ip}}/get'
             let response = await fetch(server_ip,
             {
                 method: "POST",

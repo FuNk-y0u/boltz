@@ -45,11 +45,6 @@ def example_route():
     }
     return jsonify(data)
 
-@app.route('/test')
-def test():
-    server_ip = SERVER_IP + ":" + str(SERVER_PORT)
-    return render_template("test.html", server_ip = server_ip)
-
 @app.route('/')
 def home():
     link = str(request.args.get("linkBox"))
@@ -63,8 +58,7 @@ def home():
 
 @app.route('/<Token>')
 def download_page(Token):
-    server_ip = SERVER_IP + ":" + str(SERVER_PORT)
-    return render_template("download.html",file_token = Token, server_ip = server_ip)
+    return render_template("download.html",file_token = Token, server_ip = SERVER_LINK)
 
 @app.route('/download/<token>')
 def download_zip(token):
@@ -73,4 +67,4 @@ def download_zip(token):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host="127.0.0.1", port= 8000)
+    app.run(host=SERVER_IP, port=SERVER_PORT)
