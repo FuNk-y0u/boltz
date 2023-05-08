@@ -1,11 +1,49 @@
-<html>
-    <head>
-        <title>Boltz</title>
-    </head>
-    <body>
-        <form action="#"  method="get">
-            <input id = "linkBox" type="text" name="linkBox">
-            <input id = "submitButton" type="submit" value="submit">
-        </form>
-    </body>
-</html>
+{% extends "base.html" %}
+
+
+{% block content %}
+
+<div style ="
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+  min-width: 100%;
+  background: rgb(45,131,253);
+background: linear-gradient(0deg, rgba(45,131,253,1) 0%, rgba(0,0,0,1) 100%);">
+    <form action="#"  method="get" style="scale: 130%;">
+        <h1 style="color:white; padding: 10px;" class="display-4">
+            ⚡ Boltz
+        </h1>
+        <div class="input-group mb-3" style="background-color: black;width: 100%;">
+            <span class="input-group-text" id="basic-addon1" style="background-color: black;"><i class="fa-brands fa-spotify" id = "logo" style="color: #ffffff; background-color: black;"></i></span>
+            <input type="text" class="form-control" placeholder="https://open.spotify.com/..." aria-label="Username" aria-describedby="basic-addon1" name="linkBox" id = "linkBox" style="background-color: black; color: white;">
+        </div>
+        <div class="col-auto">
+            <button type="submit" id = "subimtButton"value = "send" class="btn btn-primary mb-3">Download Play List</button>
+        </div>
+        
+</form>
+</div>
+<div>
+    <center>
+    <h1 style="color:white; padding: 10px;" class="display-4">
+        Welcome To ⚡ Boltz
+    </h1>
+    <p style="color:white">
+        Boltz is a free to use and open source spotify to mp3 converter, boltz is light weight easy to use and comes with no ads and other registration bs.</br>
+        All we want to do is provide clean and transparent service to our users by removing ads and registration.</br>
+        we are very thankfull to you for giving ⚡ boltz a chance!</br>
+        check out boltz github repo:&nbsp;
+        <i class="fa-brands fa-github" style="color: #ffffff;"></i>
+        <a href="https://github.com/FuNk-y0u/boltz" class="link-primary">Boltz Github</a>
+    </p>
+
+    <p style="color:white">made with</p>
+    <div class = "heart" style="scale:0.1; padding: 0; margin: 0;"></div>
+    <p style="color:white;">by Boltz Team</p>
+    </center>
+</div>
+
+{% endblock %}

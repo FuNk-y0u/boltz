@@ -1,97 +1,139 @@
-<html>
-    <head>
-        <script>
-            function sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
-            async function req_info(){
-                await sleep(3000);
+{% extends "base.html" %}
 
-                let running = true;
-                let prev_song = '#';
-                let count = 1;
+{% block script %}
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function req_info(){
+        await sleep(3000);
+        let running = true;
+        let prev_song = '#';
+        let count = 1;
+        while(running){
+            var token = "{{file_token}}"
+            var server_ip_tmp = 'http://{{server_ip}}'
+            var server_ip = 'http://{{server_ip}}/get'
+            let response = await fetch(server_ip,
+            {
+                method: "POST",
+                body:JSON.stringify(token)
+            });
+            let data = await response.text();
+            console.log(data);
+            data = JSON.parse(data)
+            var id1 = document.getElementById("totalprogress");
+            id1.value = data.total_progress;
+            var download_title = document.getElementById("download_title");
+            download_title.innerText = "download status " + data.total_progress + "%";
+            
 
-                while(running){
-                    var token = "{{file_token}}"
-                    var server_ip_tmp = 'http://{{server_ip}}'
-                    var server_ip = 'http://{{server_ip}}/get'
-
-                    let response = await fetch(server_ip,
-                    {
-                        method: "POST",
-                        body:JSON.stringify(token)
-                    });
-
-                    let data = await response.text();
-                    console.log(data);
-                    data = JSON.parse(data)
-
-                    var id1 = document.getElementById("totalprogress");
-                    id1.innerText = data.total_progress + "%";
-
-                    
-                    var id2 = document.getElementById(data.current_song);
-                    if(id2 == null)
-                    {
-
-                        if(prev_song == '#')
-                        {
-                            prev_song = data.current_song;
-                        }
-
-                        if(prev_song == data.current_song)
-                        {
-                            const sdiv = document.getElementById("songlist");
-                            const song = document.createElement("H1");
-
-                            song.setAttribute('id',data.current_song);
-                            if(data.is_complete != true){
-                                song_name = document.createTextNode(data.current_song + " [PROCESSING]");
-                                song.append(song_name);
-
-                                sdiv.appendChild(song);
-                            }
-                        }
-                        else
-                        {
-                            const song_prev_div = document.getElementById(prev_song);
-                            song_prev_div.innerHTML = prev_song + " [COMPLETED]";
-                            prev_song = data.current_song;
-                        }
-
-                    }
-                    else{
-                        if(data.is_complete == true)
-                        {
-                            const song_prev_div = document.getElementById(data.current_song);
-                            song_prev_div.innerHTML = data.current_song + " [COMPLETED]";
-
-                            const info_h1 = document.getElementById("info");
-                            info_h1.innerHTML = "Your conversion is complete please wait 3s while we redirect you"
-
-                            await sleep(3000);
-                            window.location.replace(server_ip_tmp  + '/download/' + token);
-                            break;
-                        }
-                    }
-                    await sleep(1000);
+            var id2 = document.getElementById(data.current_song);
+            if(id2 == null)
+            {
+                if(prev_song == '#')
+                {
+                    prev_song = data.current_song;
                 }
-                
-            }
-            window.onload = req_info;
-        </script>
-    </head>
-    <h1>
-        downloading shit
-    </h1>
-    <h1>
-        total progress:
-    </h1>
-    <h1 id = "totalprogress"></h1>
+                if(prev_song == data.current_song)
+                {
+                    const sdiv = document.getElementById("songlist");
+                    const div = document.createElement("div");
+                    div.setAttribute('id','song_div')
+                    const song = document.createElement("H8");
+                    song.setAttribute('id',data.current_song);
+                    div.style.borderColor = "#2d83fd";
 
+                    if(data.is_complete != true){
+                        song_name = document.createTextNode("↻         " + data.current_song);
+                        song.append(song_name);
+                        div.append(song);
+                        sdiv.appendChild(div);
+                    }
+                }
+                else
+                {
+                    const song_prev_div = document.getElementById(prev_song);
+                    song_prev_div.innerHTML = "✅         " +prev_song;
+                    song_prev_div.style.borderColor="#000000";
+                    prev_song = data.current_song;
+                }
+            }
+            else{
+                if(data.is_complete == true)
+                {
+                    const song_prev_div = document.getElementById(data.current_song);
+                    song_prev_div.innerHTML = "✅         " + data.current_song;
+                    song_prev_div.style.borderColor="#000000";
+
+                    const info_h1 = document.getElementById("info");
+                    info_h1.innerHTML = "Your download should start in 3 seconds automatically or press the link below"
+                    await sleep(3000);
+                    document.getElementById("download_again").style.display = "block";
+                    document.getElementById("download_again").href = server_ip_tmp  + '/download/' + token;
+                    window.location.replace(server_ip_tmp  + '/download/' + token);
+                    break;
+                }
+            }
+            await sleep(1000);
+        }
+        
+    }
+    window.onload = req_info;
+{% endblock %}
+
+{% block link %}
+{% endblock %}
+
+
+{% block content %}
+<center>
+<div style="color:white">
+    <h1 style="color:white; padding: 10px;" class="display-4">
+        converting your songs
+    </h1>
     <div id = "songlist"></div>
 
-    <h1 id = "info"></h1>
+    <h7 id = "info"></h7>
+    <a href="" id="download_again" class="link-underline-primary" style="display: none;">Download Again</a>
 
-    <a href="#"></a>
-</html>
+    <div style="border-top-style: solid; border-top-color: aliceblue; border-top-width: 1px; width: 100%; height: 10%;background-color: #121212;position: fixed;
+    bottom: 0;
+    width: 100%;">
+        <h7 id = "download_title"></h7></br>
+        <progress id="totalprogress" value="0" max="100" style="width: 60%; height: 10px;"></progress>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <div id = "about_end">
+        <center>
+        <h1 style="color:white; padding: 10px;" class="display-4">
+            Thank You For Using ⚡ Boltz
+        </h1>
+        <p style="color:white">
+            Boltz is a free to use and open source spotify to mp3 converter, boltz is light weight easy to use and comes with no ads and other registration bs.</br>
+            All we want to do is provide clean and transparent service to our users by removing ads and registration.</br>
+            we are very thankfull to you for giving ⚡ boltz a chance!</br>
+            check out boltz github repo:&nbsp;
+            <i class="fa-brands fa-github" style="color: #ffffff;"></i>
+            <a href="https://github.com/FuNk-y0u/boltz" class="link-primary">Boltz Github</a>
+        </p>
+    
+        <p style="color:white">made with</p>
+        <div class = "heart" style="scale:0.1; padding: 0; margin: 0;"></div>
+        <p style="color:white;">by Boltz Team</p>
+        </center>
+        <br>
+        <br>
+        <br>
+        <br>
+        <h1>
+            &nbsp;
+        </h1>
+    </div>
+
+</div>
+</center>
+{% endblock %}

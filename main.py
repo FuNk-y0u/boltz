@@ -38,7 +38,6 @@ def example_route():
     csong = file_data[token]["current_song"]
     iscomplete = file_data[token]["is_complete"]
 
-
     data = {
         "total_progress": str(tprogress),
         "current_song": csong,
