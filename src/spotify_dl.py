@@ -74,6 +74,50 @@ def spotify_dl(spotifyUrl, token):
 def gen_zip(token):
     shutil.make_archive(f"{DOWNLOADS_FOLDER}/{token}/{token}", format='zip', root_dir = f"{DOWNLOADS_FOLDER}/{token}/")
 
+def spotify_search(name, item_type):
+    class item:
+        track = 'track'
+        playlist = 'playlist'
+        album = 'album'
+
+    spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=CLIENT_ID, client_secret=CLIENT_SECRET))
+
+    if(item_type == item.track):
+        results = spotify.search(q=item.track+':' + name, type=item.track)
+        items = results['tracks']['items']
+        print("ITEMS LEN: " + str(len(items)))
+
+        array_results = []
+        for item in items:
+            array_results.append({"name" : item['name'], "link":item['external_urls']['spotify'], "image":item['album']['images'][0]['url']})
+        
+        return array_results
+
+    elif(item_type == item.album):
+        results = spotify.search(q=item.album+':' + name, type=item.album)
+
+        items = results['albums']['items']
+        print("ITEMS LEN: " + str(len(items)))
+
+
+        array_results = []
+        for item in items:
+            array_results.append({"name":item['name'], "link":item['external_urls']['spotify'], "image":item['images'][0]['url']})
+        return array_results
+    elif(item_type == item.playlist):
+        
+        results = spotify.search(q=item.playlist+':' + name, type=item.playlist)
+
+        items = results['playlists']['items']
+        print("ITEMS LEN: " + str(len(items)))
+
+
+        array_results = []
+        for item in items:
+            array_results.append({"name":item['name'],"link":item['external_urls']['spotify'], "image":item['images'][0]['url']})
+        return array_results
+
+
 
 
 

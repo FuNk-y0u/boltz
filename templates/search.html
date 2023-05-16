@@ -2,7 +2,6 @@
 
 
 {% block content %}
-
 <div style ="
   display: flex;
   justify-content: center;
@@ -17,14 +16,18 @@ background: linear-gradient(0deg, rgba(45,131,253,1) 0%, rgba(0,0,0,1) 100%);">
             ⚡ Boltz
         </h1>
         <div class="input-group mb-3" style="background-color: black;width: 100%;">
-            <span class="input-group-text" id="basic-addon1" style="background-color: black;"><i class="fa-brands fa-spotify" id = "logo" style="color: #ffffff; background-color: black;"></i></span>
-            <input type="text" class="form-control" placeholder="https://open.spotify.com/..." aria-label="Username" aria-describedby="basic-addon1" name="linkBox" id = "linkBox" style="background-color: black; color: white;">
+            <span class="input-group-text" id="basic-addon1" style="background-color: black;"><i class="fas fa-search" style="color: #ffffff;"></i></span>
+            <input type="text" class="form-control" placeholder="Search Here" aria-label="Username" aria-describedby="basic-addon1" name="linkBox" id = "linkBox" style="background-color: black; color: white;">
         </div>
+        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name = "type">
+            <option selected value="track">Song</option>
+            <option value="album">Album</option>
+            <option value="playlist">Playlist</option>
+        </select>
         <div class="col-auto">
-            <button type="submit" id = "subimtButton"value = "send" class="btn btn-primary mb-3">Download Play List</button>
+            <button type="submit" id = "subimtButton"value = "send" class="btn btn-primary mb-3">Search</button>
         </div>
-        <p style="color:white">Want to search songs and download on fly? <a href="/search" class="link-light">Search Here</a> </p>
-        
+
 </form>
 </div>
 <div>
@@ -46,5 +49,4 @@ background: linear-gradient(0deg, rgba(45,131,253,1) 0%, rgba(0,0,0,1) 100%);">
     <p style="color:white;">by Boltz Team</p>
     </center>
 </div>
-
 {% endblock %}

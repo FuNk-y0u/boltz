@@ -97,3 +97,43 @@
     background: rgb(45,131,253);
     background: linear-gradient(0deg, rgba(45,131,253,1) 0%, rgba(0,0,0,1) 100%); 
 }
+
+#song_div
+{
+    display: block;
+    padding: 10px 0;
+    text-align: left;
+    left: 3%;
+
+    font-size: 20px;
+    background-color: #121212;
+    border-radius: 5px;
+    width: 60%;
+    height: 60px;
+
+    margin: 5px;
+    border-color: #000000;
+    border-style: solid;
+    border-width: 2px;
+
+}
+
+#res_div
+{
+    display: block;
+    padding: 10px 0;
+    text-align: left;
+    left: 3%;
+
+    font-size: 20px;
+    background-color: #121212;
+    border-radius: 5px;
+    width: 60%;
+    height: 60px;
+
+    margin: 5px;
+    border-color: #2d83fd;
+    border-style: solid;
+    border-width: 2px;
+
+}

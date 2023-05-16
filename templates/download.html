@@ -70,6 +70,7 @@
                     await sleep(3000);
                     document.getElementById("download_again").style.display = "block";
                     document.getElementById("download_again").href = server_ip_tmp  + '/download/' + token;
+                    document.getElementById("convert_next").style.display = "block";
                     window.location.replace(server_ip_tmp  + '/download/' + token);
                     break;
                 }
@@ -95,6 +96,9 @@
 
     <h7 id = "info"></h7>
     <a href="" id="download_again" class="link-underline-primary" style="display: none;">Download Again</a>
+    <br>
+    <br>
+    <a id="convert_next" class="link-light" style="display: none;" href="/">Convert Next <i class="fa-solid fa-arrow-right" style="color: #ffffff;"></i></a>
 
     <div style="border-top-style: solid; border-top-color: aliceblue; border-top-width: 1px; width: 100%; height: 10%;background-color: #121212;position: fixed;
     bottom: 0;

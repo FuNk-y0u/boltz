@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block script %}
+    function get_res(value)
+    {
+        server_ip = "{{server_ip}}"
+        search_type = "{{search_t}}"
+        value = value.replace("https://open.spotify.com/" + search_type + "/", "")
+        window.location.replace(server_ip  + '/res/' + search_type + ',' + value);
+    }
+{% endblock %}
+{% block content %}
+<center>
+    <form action="#"  method="get" style="">
+        <h1 style="color:white; padding: 10px;" class="display-4">
+            ⚡ Boltz
+        </h1>
+        <div class="input-group mb-3" style="background-color: black;width: 40%;">
+            <span class="input-group-text" id="basic-addon1" style="background-color: black;"><i class="fas fa-search" style="color: #ffffff;"></i></span>
+            <input type="text" class="form-control" placeholder="Search Here" aria-label="Username" aria-describedby="basic-addon1" name="linkBox" id = "linkBox" style="background-color: black; color: white;">
+        </div>
+        <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example" name = "type" style="width: 40%">
+            <option selected value="track">Song</option>
+            <option value="album">Album</option>
+            <option value="playlist">Playlist</option>
+        </select>
+        <div class="col-auto">
+            <button type="submit" id = "subimtButton"value = "send" class="btn btn-primary mb-3">Search</button>
+        </div>
+    </form>
+<h1 style="color:white; padding: 10px;" class="display-4">
+    Search Results
+</h1>
+    
+    <div style="scale:100%; padding: 30px;" >
+        {% for item in items: %}
+            <div id="res_div" style="">
+                <img src="{{item['image']}}" width="40" height="40">
+                <h8 value="{{item['link']}}" name="res_link" style="color:white;">{{item['name']}}</h8>
+                <div class="col-auto" style="float: right; padding-right: 5px;">
+                    <button type="submit" id = "{{item['link']}}" onClick="get_res(this.id)"class="btn btn-primary mb-3"><i class="fas fa-download" style="color: #ffffff;"></i></button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <div id = "about_end">
+        <h1 style="color:white; padding: 10px;" class="display-4">
+            Thank You For Using ⚡ Boltz
+        </h1>
+        <p style="color:white">
+            Boltz is a free to use and open source spotify to mp3 converter, boltz is light weight easy to use and comes with no ads and other registration bs.</br>
+            All we want to do is provide clean and transparent service to our users by removing ads and registration.</br>
+            we are very thankfull to you for giving ⚡ boltz a chance!</br>
+            check out boltz github repo:&nbsp;
+            <i class="fa-brands fa-github" style="color: #ffffff;"></i>
+            <a href="https://github.com/FuNk-y0u/boltz" class="link-primary">Boltz Github</a>
+        </p>
+    
+        <p style="color:white">made with</p>
+        <div class = "heart" style="scale:0.1; padding: 0; margin: 0;"></div>
+        <p style="color:white;">by Boltz Team</p>
+        </center>
+        <br>
+        <br>
+        <br>
+        <br>
+        <h1>
+            &nbsp;
+        </h1>
+    </div>
+{% endblock %}

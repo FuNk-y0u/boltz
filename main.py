@@ -64,7 +64,30 @@ def download_page(Token):
 def download_zip(token):
     return send_file(f"{DOWNLOADS_FOLDER}/{token}/{token}.zip")
 
+@app.route('/search')
+def search():
+    keywords = str(request.args.get("linkBox"))
+    search_type = str(request.args.get("type"))
+    results = spotify_search(keywords, search_type)
+    if(str(results) == "None"):
+        return render_template("search.html")
+    else:
+        return render_template("result.html", items = results, search_t = search_type, server_ip = SERVER_LINK)
 
+@app.route('/res/<res>')
+def result(res):
+    res = res.split(',')
+    link = 'https://open.spotify.com/' + res[0] + '/' + res[1]
+    
+    file_token = progressAdddef()
+    thread = threading.Thread(target=downloadPl, args=(link, False, file_token,))
+    thread.start()
+    return redirect(url_for("download_page", Token = file_token))
+
+    
+
+
+    
 
 if __name__ == '__main__':
-    app.run(host=SERVER_IP, port=SERVER_PORT)
+    app.run(host=SERVER_IP, port=SERVER_PORT, debug=True)
