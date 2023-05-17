@@ -3,14 +3,14 @@
     function get_res(value)
     {
         server_ip = "{{server_ip}}"
-        search_type = "{{search_t}}"
+        search_type = "{{search_type}}"
         value = value.replace("https://open.spotify.com/" + search_type + "/", "")
         window.location.replace(server_ip  + '/res/' + search_type + ',' + value);
     }
 {% endblock %}
 {% block content %}
 <center>
-    <form action="#"  method="get" style="">
+    <form action="#"  method="get">
         <h1 style="color:white; padding: 10px;" class="display-4">
             ⚡ Boltz
         </h1>
@@ -32,12 +32,12 @@
 </h1>
     
     <div style="scale:100%; padding: 30px;" >
-        {% for item in items: %}
-            <div id="res_div" style="">
-                <img src="{{item['image']}}" width="40" height="40">
-                <h8 value="{{item['link']}}" name="res_link" style="color:white;">{{item['name']}}</h8>
+        {% for result in results: %}
+            <div id="res_div">
+                <img src="{{result['image']}}" width="40" height="40">
+                <h8 value="{{result['link']}}" name="res_link" style="color:white;">{{result['name']}}</h8>
                 <div class="col-auto" style="float: right; padding-right: 5px;">
-                    <button type="submit" id = "{{item['link']}}" onClick="get_res(this.id)"class="btn btn-primary mb-3"><i class="fas fa-download" style="color: #ffffff;"></i></button>
+                    <button type="submit" id = "{{result['link']}}" onClick="get_res(this.id)"class="btn btn-primary mb-3"><i class="fas fa-download" style="color: #ffffff;"></i></button>
                 </div>
             </div>
         {% endfor %}
