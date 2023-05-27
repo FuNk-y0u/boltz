@@ -4,6 +4,8 @@
 Boltz is a free and open source spotify to mp3 converter api and website!
 [WEBSITE] for online conversion (uses boltz v-0.1) : [boltz](https://bolz.herokuapp.com)
 
+The idea and concept for [spotify_dl](https://github.com/SathyaBhat/spotify-dl) goes to the wrightfull owners and contributors of spotify_dl, boltz is just a api conversion of [spotify_dl](https://github.com/SathyaBhat/spotify-dl)
+
 Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses heavily customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl) specificly built for boltz website: [boltz website](https://boltz.herokuapp.com).
 
 
