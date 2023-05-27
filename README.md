@@ -1,5 +1,5 @@
 
-# [⚡]Boltz!
+# [⚡]Boltz v-0.1!
 
 Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses highly customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl) specificly built for boltz website [boltz](https://bolz.herokuapp.com).
 
