@@ -1,7 +1,10 @@
 
-# [⚡]Boltz v-0.1!
+# [⚡]Boltz v-0.2!
 
-Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses highly customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl) specificly built for boltz website [boltz](https://bolz.herokuapp.com).
+Boltz is a free and open source spotify to mp3 converter api and website!
+[WEBSITE] for online conversion (uses boltz v-0.1) : [boltz](https://bolz.herokuapp.com)
+
+Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses heavily customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl) specificly built for boltz website [boltz](https://bolz.herokuapp.com).
 
 
 ## Usage
@@ -26,7 +29,7 @@ USE_FULL_CORE = True
 # !NOTE only usable when USE_FULL_CORE is disabled
 threshval = 5 
 ```
-2. in bash
+2. to run just
 ```bash
   $ python app.py 
 ```
