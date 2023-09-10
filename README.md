@@ -18,13 +18,6 @@ CLIENT_SECRET = '[YOUR TOKEN HERE]'
 
 # Your Download Location
 DOWNLOAD_FOLDER = 'downloads/'
-
-# Use All The Cores Of your Computer to download songs at maximum speeds, can cause glitches
-USE_FULL_CORE = True
-
-# No of parallel downloads per time
-# !NOTE only usable when USE_FULL_CORE is disabled
-threshval = 5 
 ```
 
 # 2.Example app using boltz:
