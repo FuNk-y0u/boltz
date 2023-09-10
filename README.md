@@ -1,20 +1,15 @@
 
-# [⚡]Boltz v-0.2!
+# [⚡]Boltz v-0.1!
 
-Boltz is a free and open source spotify to mp3 converter api and website!
-[WEBSITE] for online conversion (uses boltz v-0.1) : [boltz](https://bolz.herokuapp.com)
-
-The idea and concept for [spotify_dl](https://github.com/SathyaBhat/spotify-dl) goes to the wrightfull owners and contributors of spotify_dl, boltz is just a api conversion of [spotify_dl](https://github.com/SathyaBhat/spotify-dl)
-
-Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses heavily customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl) specificly built for boltz website: [boltz website](https://boltz.herokuapp.com).
-
+Boltz is a free and open source spotify to mp3 converter api!
+Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses heavily customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl).
 
 ## Documentation
 
 To use [⚡]Boltz api simply:
 
 
-## 1. configure boltz in config.py 
+# 1. configure boltz in config.py 
 ```python
     
 # Your Spotify Client Tokens
@@ -32,7 +27,7 @@ USE_FULL_CORE = True
 threshval = 5 
 ```
 
-## 2.Example app using boltz:
+# 2.Example app using boltz:
 
 ```python
 
@@ -44,9 +39,17 @@ if __name__ == '__main__':
     
 ```
 
-## 3. to run your app:
+# 3. to run your app:
 ```bash
   $ python app.py 
 ```
-    
+
+## Dependencies
+* Python 3
+* Spotipy
+* yt_dlp
+* ffmpeg
+
+## Acknowledgments
+* [spotify_dl](https://github.com/SathyaBhat/spotify-dl)
 
