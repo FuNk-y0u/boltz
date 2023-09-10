@@ -1,42 +1,23 @@
-'''
-▀█████████▄   ▄██████▄   ▄█           ███      ▄███████▄  
-  ███    ███ ███    ███ ███       ▀█████████▄ ██▀     ▄██ 
-  ███    ███ ███    ███ ███          ▀███▀▀██       ▄███▀ 
- ▄███▄▄▄██▀  ███    ███ ███           ███   ▀  ▀█▀▄███▀▄▄ 
-▀▀███▀▀▀██▄  ███    ███ ███           ███       ▄███▀   ▀ 
-  ███    ██▄ ███    ███ ███           ███     ▄███▀       
-  ███    ███ ███    ███ ███▌    ▄     ███     ███▄     ▄█ 
-▄█████████▀   ▀██████▀  █████▄▄██    ▄████▀    ▀████████▀   v0.2
-                        ▀                                 
-boltz was possible only due to spotify_dl,
-https://github.com/SathyaBhat/spotify-dl,
-please fork and star this repo thanks <3
+from datetime import datetime
+from inspect import stack, getframeinfo
 
-Utility For Boltz
-'''
+# * Boltz color dict
+colors:dict = {
+    "Info": '\033[95m',
+    "Error": '\033[91m',
+    "Ok": '\033[92m',
+}
 
-class colors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-
-def logHeader( text):
-    print(colors.HEADER + "[BOLTZ INFO] " + text)
+# * Boltz logger
+def logHeader(text:str) -> None:
+    log(text,"Info")
     
-def logError( text):
-    print(colors.FAIL + "[BOLTZ LOG] " + text)
+def logError(text:str) -> None:
+    log(text,"Error")
 
-def logOk( text):
-    print(colors.OKGREEN + "[BOLTZ OK] " + text)
-    
-def displayError( text):
-    print(colors.HEADER + "[ERROR CODE]")
-    print(colors.FAIL + str(text))
-    print(colors.HEADER + "~[ERROR CODE]")
+def logOk(text:str) -> None:
+    log(text,"Ok")
+
+def log(message:str,title:str) -> None:
+    caller = getframeinfo(stack()[2][0])
+    print(f"{colors[title]}{datetime.now()} | {caller.filename}:{caller.lineno} {title} - {message}")
