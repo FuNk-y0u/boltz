@@ -29,10 +29,10 @@ class Boltz:
                     tracks = self.__fetch_playlist(_boltzurl.id)
 
                 case 'album':
-                    print('album')
+                   tracks = self.__fetch_album(_boltzurl.id)
 
                 case 'track':
-                    print('track')
+                    track = self.__fetch_track(_boltzurl.id)
 
                 case _:
                     print("Not supported by boltz")
@@ -77,6 +77,7 @@ class Boltz:
                     item.release_date,
                     item.total_tracks,
                     album_images[0].url if album_images[0] else None,
+                    artists
                 )
 
                 _track = BoltzTrack(item.id,
@@ -93,13 +94,82 @@ class Boltz:
             _is_running = False if _total_songs == offset else True # Checks if all the songs are processed
         
         return _track_list # Returning list[BoltzItem]
+
+    # * Fetches and parses album
+    def __fetch_album(self, _id) -> list[BoltzTrack]:
+        offset = 0 # count for no of tracks
+
+        _track_list = []
+
+        _is_running = True
+
+        while _is_running:
+
+            album_items = self.sp.album(album_id=_id)
+            res_items = self.sp.album_tracks(album_id=_id, offset=offset)
+
+            _total_songs = res_items.get("total")
+
+            album = parse_album(album_items) # Parsing dict to BoltzAlbum
+
+            main_artist_id = album.artists[0].uri
+
+            genres = self.sp.artist(artist_id=main_artist_id).get("genres",[]) if main_artist_id else [] # Getting artist genre
+
+            _items_parsed = parse_items_album(res_items, album) # Pasing dict to BoltzItem
+
+            for item in _items_parsed:
+                if item is None:
+                    offset += 1
+                    continue
+            
+                _track = BoltzTrack(item.id,
+                            item.name,
+                            item.track_number,
+                            album,
+                            ",".join([artist.name for artist in album.artists]),
+                            genres[0] if genres else ""
+                )
+
+                _track_list.append(_track)
+
+                offset += 1
+
+            _is_running = False if _total_songs == offset else True # Checks if all the songs are processed
+
+        return _track_list # Returning List[BoltzTrack]
+
+    def __fetch_track(self, _id) -> BoltzTrack:
+
+        res_items = self.sp.track(track_id=_id)
+
+        album = parse_album(res_items["album"])
+
+        main_artist_id = album.artists[0].uri
+        genres = self.sp.artist(artist_id=main_artist_id).get("genres",[]) if main_artist_id else [] # Getting artist genre
+
+        _item_parsed = parse_item_track(res_items,album)
+
+        _track = BoltzTrack(_item_parsed.id,
+                            _item_parsed.name,
+                            _item_parsed.track_number,
+                            album,
+                            ",".join([artist.name for artist in album.artists]),
+                            genres[0] if genres else ""
+        )
+
+        return _track # Returning BoltzTrack
+
+
+
+
     
 
 if __name__ == "__main__":
 
     _boltzController = Boltz() # * Initializing boltz controller
 
-    url = _boltzController.initialize_url("https://open.spotify.com/playlist/44koDbevdmaNIXhaWYkSHY?si=a6a8c0fa695b49c6") # * Passing in pl link
+    url = _boltzController.initialize_url("https://open.spotify.com/track/2nLtzopw4rPReszdYBJU6h?si=ea0c7ef0af5c4210") # * Passing in pl link
 
     if(url.is_valid): # Checks if the url is valid
         _boltzController.fetch_tracks(url) # * Fetches the info about tracks

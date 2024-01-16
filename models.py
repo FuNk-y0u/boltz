@@ -9,22 +9,6 @@ class BoltzUrl:
     is_valid:bool
 
 @dataclass
-class BoltzAlbum:
-    name:str
-    year:str
-    total_tracks:int
-    cover:str
-
-@dataclass
-class BoltzTrack:
-    id:int
-    name:str
-    position:int
-    album:BoltzAlbum
-    artist:str
-    genre:str
-
-@dataclass
 class BoltzImage:
     width:int
     height:int
@@ -45,5 +29,23 @@ class BoltzItem:
     id:str
     name:str
     track_number:int
+
+@dataclass
+class BoltzAlbum:
+    name:str
+    year:str
+    total_tracks:int
+    cover:str
+    artists:list[BoltzArtist]
+
+@dataclass
+class BoltzTrack:
+    id:int
+    name:str
+    position:int
+    album:BoltzAlbum
+    artist:str
+    genre:str
+
 
 
