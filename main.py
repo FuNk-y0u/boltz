@@ -20,22 +20,26 @@ class Boltz:
             return BoltzUrl(type,id, False)
         
     # * conducts operation accoring to your link types
-    def fetch_tracks(self, _boltzurl: BoltzUrl) -> None:
+    def fetch_tracks(self, _boltzurl: BoltzUrl) -> list[BoltzTrack]:
 
         if _boltzurl.is_valid:
             match _boltzurl.type:
 
                 case 'playlist':
                     tracks = self.__fetch_playlist(_boltzurl.id)
+                    return tracks
 
                 case 'album':
                    tracks = self.__fetch_album(_boltzurl.id)
+                   return tracks
 
                 case 'track':
                     track = self.__fetch_track(_boltzurl.id)
+                    return [track]
 
                 case _:
-                    print("Not supported by boltz")
+                    return []
+
     
     # * Fetches and parses playlist
     def __fetch_playlist(self, _id) -> list[BoltzTrack]:
@@ -46,13 +50,15 @@ class Boltz:
         _is_running = True # For while loop below
 
         while _is_running:
-
-            res_items = self.sp.playlist_items(
-                playlist_id= _id,
-                fields= SPOTIPY_FIELDS,
-                additional_types= ["track"],
-                offset= offset
-            ) # Returns a dict
+            try:
+                res_items = self.sp.playlist_items(
+                    playlist_id= _id,
+                    fields= SPOTIPY_FIELDS,
+                    additional_types= ["track"],
+                    offset= offset
+                )
+            except Exception as e:
+                break
             
             res_items_parsed = parse_items(res_items) # Parsing dict to List[BoltzItem]
 
@@ -104,9 +110,12 @@ class Boltz:
         _is_running = True
 
         while _is_running:
+            try:
+                album_items = self.sp.album(album_id=_id)
+                res_items = self.sp.album_tracks(album_id=_id, offset=offset)
+            except Exception as e:
+                break
 
-            album_items = self.sp.album(album_id=_id)
-            res_items = self.sp.album_tracks(album_id=_id, offset=offset)
 
             _total_songs = res_items.get("total")
 
@@ -140,8 +149,10 @@ class Boltz:
         return _track_list # Returning List[BoltzTrack]
 
     def __fetch_track(self, _id) -> BoltzTrack:
-
-        res_items = self.sp.track(track_id=_id)
+        try:
+            res_items = self.sp.track(track_id=_id)
+        except Exception as e:
+            return []
 
         album = parse_album(res_items["album"])
 
@@ -160,19 +171,17 @@ class Boltz:
 
         return _track # Returning BoltzTrack
 
-
-
-
-    
-
 if __name__ == "__main__":
 
     _boltzController = Boltz() # * Initializing boltz controller
 
-    url = _boltzController.initialize_url("https://open.spotify.com/track/2nLtzopw4rPReszdYBJU6h?si=ea0c7ef0af5c4210") # * Passing in pl link
+    url = _boltzController.initialize_url("https://open.spotify.com/playlist/4WXsLmfws6PGuvHf12vrt7m?si=9d28874fc53b4e5f") # * Passing in pl link
 
     if(url.is_valid): # Checks if the url is valid
-        _boltzController.fetch_tracks(url) # * Fetches the info about tracks
+        if(_boltzController.fetch_tracks(url)): # * Fetches the info about tracks
+            print(_boltzController.fetch_tracks(url)[0].name)
+        else:
+            print("Track not supported")
 
     else:
         print("error invalid link") # ! Prints if the url is invalid
