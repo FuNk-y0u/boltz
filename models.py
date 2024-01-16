@@ -47,5 +47,12 @@ class BoltzTrack:
     artist:str
     genre:str
 
+@dataclass
+class BoltzMP3:
+    is_valid:bool
+    track:BoltzTrack
+    mp3_filename:str
+    index:int
+
 
 

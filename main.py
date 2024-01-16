@@ -5,14 +5,14 @@ from inc import *
 class Boltz:
 
     # * Constructor
-    def __init__(self, client_id=CLIENT_ID, client_secret=CLIENT_SECRET) -> None:
+    def __init__(self, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, save_path="./downloads") -> None:
         self.sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
+        self.save_path = save_path
 
     # * Initializes and parses your url
     def initialize_url(self, _link:str) -> BoltzUrl:
-
-        # TODO maybe merge the parse_validate_func here?
         type, id = parse_validate_url(_link)
+
         if type != 0 and id != 0:
             return BoltzUrl(type, id, True)
         
@@ -21,10 +21,9 @@ class Boltz:
         
     # * conducts operation accoring to your link types
     def fetch_tracks(self, _boltzurl: BoltzUrl) -> list[BoltzTrack]:
-
         if _boltzurl.is_valid:
-            match _boltzurl.type:
 
+            match _boltzurl.type:
                 case 'playlist':
                     tracks = self.__fetch_playlist(_boltzurl.id)
                     return tracks
@@ -148,6 +147,7 @@ class Boltz:
 
         return _track_list # Returning List[BoltzTrack]
 
+    # * Fetches and parses track
     def __fetch_track(self, _id) -> BoltzTrack:
         try:
             res_items = self.sp.track(track_id=_id)
@@ -171,17 +171,93 @@ class Boltz:
 
         return _track # Returning BoltzTrack
 
+    # * Download and convert tracks
+    def download_track(self, track:BoltzTrack) -> BoltzMP3:
+
+        _query = generate_ytdl_query(track.artist, track.name)
+
+        _filename = [f"{track.artist} - {track.name}", track.position]
+        _filepath = path.join(self.save_path, _filename[0])
+
+        _mp3_filename = f"{_filepath}.mp3"
+        mp3_filepath = path.join(_mp3_filename)
+
+        _out_template = f"{_filepath}.%(ext)s"
+
+        _yt_dl_options= generate_ytdl_opts(_out_template,
+                                            SPONSOR_BLOCK_PP,
+                                            track.name,
+                                            track.artist,
+                                            track.album
+        )
+
+        with yt_dlp.YoutubeDL(_yt_dl_options) as _ydl:
+            try:
+                _ydl.download([_query])
+            
+            except Exception as e:
+                return BoltzMP3(False, track, _mp3_filename, track.position)
+            
+            return BoltzMP3(True, track, _mp3_filename, track.position)
+    
+    # * Adding details to song
+    def _set_tags(self, _boltzmp3:BoltzMP3, _total_tracks:int) -> bool:
+        try:
+            _mp3_file = MP3(_boltzmp3.mp3_filename, ID3=EasyID3)
+        except Exception as e:
+            return False
+        
+        _mp3_file["date"] = _boltzmp3.track.album.year
+        _mp3_file["tracknumber"] = (str(_boltzmp3.track.position) + "/" + str(_total_tracks))
+        _mp3_file["genre"] = _boltzmp3.track.genre
+
+        try:
+            _mp3_file.save()
+        except Exception as e:
+            return False
+
+        _mp3_file = MP3(_boltzmp3.mp3_filename, ID3=ID3)
+        _cover = _boltzmp3.track.album.cover
+
+        if _cover.lower().startswith("http"):
+            try:
+                _req = urllib.request.Request(_cover)
+                with urllib.request.urlopen(_req) as _response:
+                    _mp3_file.tags["APIC"] = APIC(
+                        encoding=3,
+                        mime="image/jpeg",
+                        type=3,
+                        desc="Front Cover",
+                        data=_response.read(),
+                    )
+            except Exception as e:
+                pass
+        
+        try:
+            _mp3_file.save()
+            return True
+        except Exception as e:
+            return False
+
 if __name__ == "__main__":
 
     _boltzController = Boltz() # * Initializing boltz controller
 
-    url = _boltzController.initialize_url("https://open.spotify.com/playlist/4WXsLmfws6PGuvHf12vrt7m?si=9d28874fc53b4e5f") # * Passing in pl link
+    url = _boltzController.initialize_url("https://open.spotify.com/track/7KmbiagSkUbepU88x7NWjb?si=ec8e2fe921264cde") # * Passing in pl link
 
     if(url.is_valid): # Checks if the url is valid
+
         if(_boltzController.fetch_tracks(url)): # * Fetches the info about tracks
-            print(_boltzController.fetch_tracks(url)[0].name)
+            
+            tracks = _boltzController.fetch_tracks(url)
+            mp3 = _boltzController.download_track(tracks[0])
+
+            if(_boltzController._set_tags(mp3, len(tracks))):
+                print(f"Downloaded {tracks[0].name}")
+            else:
+                print("Something went wrong while setting tags") # ! Prints if conversion to mp3 breaks
         else:
-            print("Track not supported")
+            print("Track not supported") # ! Prints if either the url type or token is invalid
 
     else:
         print("error invalid link") # ! Prints if the url is invalid

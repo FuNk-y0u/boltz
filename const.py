@@ -10,3 +10,17 @@ SPOTIPY_FIELDS = ("items.track.name,items.track.artists(name, uri),"
 # * Spotify Client Tokens
 CLIENT_ID='0797e2fdf87b42ca8469beae2587bae4'
 CLIENT_SECRET='19fd3eb103e7482587c186b760b8f3c3'
+
+# * YTDL filtering options
+SPONSOR_BLOCK_PP = [
+    {
+        "key": "SponsorBlock",
+        "categories": ["skip_non_music_sections"],
+    },
+    {
+        "key": "ModifyChapters",
+        "remove_sponsor_segments": ["music_offtopic"],
+        "force_keyframes": True,
+    },
+]
+

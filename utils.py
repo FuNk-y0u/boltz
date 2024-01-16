@@ -75,6 +75,7 @@ def parse_items(items:dict) -> list[BoltzItem]:
 
     return _boltz_items # Returning list[BoltzItem]
 
+# * Function to parse dict to BoltzAlbum
 def parse_album(album_info:dict) -> BoltzAlbum:
 
     _album_name = album_info["name"] if album_info["name"] else ""
@@ -105,8 +106,15 @@ def parse_album(album_info:dict) -> BoltzAlbum:
                 )
             )
     
-    return BoltzAlbum(_album_name, _release_year,_total_tracks, _boltz_images[0].url if _boltz_images[0] else None, _boltz_artists)
-        
+    return BoltzAlbum(
+        _album_name,
+        _release_year,
+        _total_tracks,
+        _boltz_images[0].url if _boltz_images[0] else None,
+        _boltz_artists
+    )
+
+# * Function to parse dict to BoltzItems with album       
 def parse_items_album(items:dict, album:BoltzAlbum) -> list[BoltzItem]:
     _boltz_items = [] # list[BoltzItem]
     for item in items["items"]:
@@ -144,6 +152,7 @@ def parse_items_album(items:dict, album:BoltzAlbum) -> list[BoltzItem]:
 
     return _boltz_items # Returning list[BoltzItem]
 
+# * Function to parse dict to BoltzItem
 def parse_item_track(item:dict, album:BoltzAlbum) -> BoltzItem:
     _boltz_item = None # list[BoltzItem]
     
@@ -180,3 +189,47 @@ def parse_item_track(item:dict, album:BoltzAlbum) -> BoltzItem:
     )
 
     return _boltz_item # Returning list[BoltzItem]
+
+def generate_ytdl_query(_artist:str, _song_name:str) -> str:
+    _query = f"{_artist} - {_song_name} Lyrics"
+    _query = _query.replace(':','').replace(' " ', '') # removing unwanted characters in query
+    return _query
+
+def generate_ytdl_opts(_out_template:str,
+                       _post_processor:[dict],
+                       _track_name:str,
+                       _track_artist:str,
+                       _track_album:str) -> dict:
+    
+    _ytdl_opts = {
+        "quiet":True,
+        "proxy": "",
+        "default_search": "ytsearch",
+        "format": "bestaudio/best",
+        "outtmpl": _out_template,
+        "postprocessors": _post_processor,
+        "noplaylist": True,
+        "no_color": False,
+        "postprocessor_args": [
+            "-metadata",
+            "title=" + _track_name,
+            "-metadata",
+            "artist=" + _track_artist,
+            "-metadata",
+            "album=" + _track_album.name,
+        ],
+    }
+
+    mp3_pp_opts = {
+        "key": "FFmpegExtractAudio",
+        "preferredcodec": "mp3",
+        "preferredquality": "192",
+    }
+
+    _ytdl_opts["postprocessors"].append(mp3_pp_opts.copy())
+
+    return _ytdl_opts
+
+    
+
+
