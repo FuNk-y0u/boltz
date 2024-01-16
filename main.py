@@ -242,28 +242,21 @@ class Boltz:
             return False
 
 if __name__ == "__main__":
-
     _boltzController = Boltz() # * Initializing boltz controller
 
-    url = _boltzController.initialize_url("https://open.spotify.com/track/7KmbiagSkUbepU88x7NWjb?si=ec8e2fe921264cde") # * Passing in pl link
+    url = _boltzController.initialize_url("https://open.spotify.com/track/1Wz6ANooiovlnQIRV5EoUq?si=353f0c420c6d41c6") # * Passing in pl link
+    ASSERT(url.is_valid, "Error: Spotify url is not valid") # Checks if the url is valid
+    
+    tracks = _boltzController.fetch_tracks(url)
+    ASSERT(tracks, "Error: while fetching tracks")
 
-    if(url.is_valid): # Checks if the url is valid
+    for track in tracks:
+        print(f"Dowloading: {track.name} ...")
 
-        if(_boltzController.fetch_tracks(url)): # * Fetches the info about tracks
-            
-            tracks = _boltzController.fetch_tracks(url)
-            mp3 = _boltzController.download_track(tracks[0])
+        mp3 = _boltzController.download_track(track)
+        ASSERT(_boltzController._set_tags(mp3, len(tracks)), "Error: while converting to mp3")
 
-            if(_boltzController._set_tags(mp3, len(tracks))):
-                print(f"Downloaded {tracks[0].name}")
-            else:
-                print("Something went wrong while setting tags") # ! Prints if conversion to mp3 breaks
-        else:
-            print("Track not supported") # ! Prints if either the url type or token is invalid
-
-    else:
-        print("error invalid link") # ! Prints if the url is invalid
-
+        print(f"Downloaded: {track.name}")
 
         
         

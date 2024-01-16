@@ -207,7 +207,7 @@ def generate_ytdl_opts(_out_template:str,
         "default_search": "ytsearch",
         "format": "bestaudio/best",
         "outtmpl": _out_template,
-        "postprocessors": _post_processor,
+        "postprocessors": [],
         "noplaylist": True,
         "no_color": False,
         "postprocessor_args": [
@@ -230,6 +230,10 @@ def generate_ytdl_opts(_out_template:str,
 
     return _ytdl_opts
 
+def ASSERT(_condition:bool, _message:str):
+    if(not _condition):
+        print(_message)
+        exit()
     
-
+    
 
