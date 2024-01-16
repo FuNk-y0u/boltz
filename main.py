@@ -1,5 +1,7 @@
 
 # ! Main Boltz File
+# TODO add search feature
+
 from inc import *
 
 class Boltz:
@@ -261,3 +263,8 @@ if __name__ == "__main__":
 
     else:
         print("error invalid link") # ! Prints if the url is invalid
+
+
+        
+        
+        
