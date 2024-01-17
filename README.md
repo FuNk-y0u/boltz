@@ -1,5 +1,5 @@
 
-# [⚡]Boltz v-0.1!
+# [⚡]Boltz v-1.0!
 
 Boltz is a free and open source spotify to mp3 converter api!
 Its a api based on [spotify_dl](https://github.com/SathyaBhat/spotify-dl). Boltz uses heavily customized and modified version of [spotify_dl](https://github.com/SathyaBhat/spotify-dl).
