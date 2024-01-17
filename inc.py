@@ -6,9 +6,11 @@ import json
 import yt_dlp
 import urllib.request
 import mutagen
+import os
 
 from spotipy.oauth2 import SpotifyClientCredentials
 from os import path
+from dotenv import load_dotenv
 from mutagen.easyid3 import EasyID3
 from mutagen.id3 import APIC, ID3
 from mutagen.mp3 import MP3

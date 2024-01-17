@@ -7,7 +7,7 @@ from inc import *
 class Boltz:
 
     # * Constructor
-    def __init__(self, client_id=CLIENT_ID, client_secret=CLIENT_SECRET, save_path="./downloads") -> None:
+    def __init__(self, client_id:str, client_secret:str, save_path="./downloads") -> None:
         self.sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=client_id, client_secret=client_secret))
         self.save_path = save_path
 
@@ -242,18 +242,30 @@ class Boltz:
             return False
 
 if __name__ == "__main__":
-    _boltzController = Boltz() # * Initializing boltz controller
 
-    url = _boltzController.initialize_url("https://open.spotify.com/track/1Wz6ANooiovlnQIRV5EoUq?si=353f0c420c6d41c6") # * Passing in pl link
-    ASSERT(url.is_valid, "Error: Spotify url is not valid") # Checks if the url is valid
+    # * Loading client_id and client_secret for boltz api
+    load_dotenv()
+    CLIENT_ID = os.getenv('CLIENT_ID')
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+
+    # * Initializing boltz controller
+    _boltzController = Boltz(CLIENT_ID, CLIENT_SECRET, "./downloads")
+
+     # * Passing in pl link
+    url = _boltzController.initialize_url("https://open.spotify.com/track/1Wz6ANooiovlnQIRV5EoUq?si=353f0c420c6d41c6")
+    ASSERT(url.is_valid, "Error: Spotify url is not valid")
     
     tracks = _boltzController.fetch_tracks(url)
     ASSERT(tracks, "Error: while fetching tracks")
 
+    # * Looping through all the tracks in playlist/album/track
     for track in tracks:
         print(f"Dowloading: {track.name} ...")
 
+        # * Downloading track
         mp3 = _boltzController.download_track(track)
+
+        # * Setting tags in mp3 file
         ASSERT(_boltzController._set_tags(mp3, len(tracks)), "Error: while converting to mp3")
 
         print(f"Downloaded: {track.name}")
