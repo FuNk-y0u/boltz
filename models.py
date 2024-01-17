@@ -55,4 +55,26 @@ class BoltzMP3:
     index:int
 
 
+@dataclass
+class BoltzSearchTypes:
+    track:str = "track"
+    album:str = "album"
+    playlist:str = "playlist"
+
+@dataclass
+class BoltzSearchResult:
+    url: BoltzUrl
+    title: str
+    artist: str
+    image: BoltzImage
+
+
+
+    
+
+
+    
+
+
+
 

@@ -240,5 +240,23 @@ class Boltz:
         except Exception as e:
             return False
 
+    def search_song(self, keywords:str, type:str, total_results=SPOTIFY_SEARCH_LIMIT):
+
+        match type:
+            case BoltzSearchTypes.track:
+                res_search = self.sp.search(q=keywords, type=BoltzSearchTypes.track, limit=total_results)
+                return parse_search_res(res_search,BoltzSearchTypes.track)
+                
+            case BoltzSearchTypes.playlist:
+                res_search = self.sp.search(q=keywords, type=BoltzSearchTypes.playlist, limit=total_results)
+                return parse_search_res(res_search, BoltzSearchTypes.playlist)
+            
+            case BoltzSearchTypes.album:
+                res_search = self.sp.search(q=keywords, type=BoltzSearchTypes.album, limit=total_results)
+                return parse_search_res(res_search, BoltzSearchTypes.album)
+            
+            case _:
+                return []
+
         
         

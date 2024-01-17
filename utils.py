@@ -230,6 +230,47 @@ def generate_ytdl_opts(_out_template:str,
 
     return _ytdl_opts
 
+# * Parses and returns link of results
+def parse_search_res(items:dict, type:str) -> [BoltzSearchResult]:
+
+    items = items[type + 's']
+    items = items["items"]
+
+    _search_res = []
+
+    for item in items:
+
+        _type = item["type"] 
+        _id = item["id"]
+
+        _title = item["name"] if item["name"] else "Unknown"
+
+        if(type != BoltzSearchTypes.playlist):
+            _artist = item["artists"][0]["name"] if item["artists"][0]["name"]  else "Unknown"
+        else:
+            _artist = item["owner"]["display_name"]
+
+        if(type == BoltzSearchTypes.track):
+            _image = item["album"]["images"][0]
+            _image = BoltzImage(_image["width"],_image["height"],_image["url"])
+        else:
+            _image = item["images"][0]
+            _image = BoltzImage(_image["width"],_image["height"],_image["url"])
+        
+        _search_res.append(
+            BoltzSearchResult(
+                BoltzUrl(_type, _id, True),
+                _title,
+                _artist,
+                _image
+            )
+        )
+    return _search_res
+        
+
+        
+
+
 def ASSERT(_condition:bool, _message:str):
     if(not _condition):
         print(_message)

@@ -20,3 +20,5 @@ SPONSOR_BLOCK_PP = [
     },
 ]
 
+# * Spotify Search Limit
+SPOTIFY_SEARCH_LIMIT = 20
