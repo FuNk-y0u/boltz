@@ -1,27 +1,24 @@
 from sv_inc import *
 from sv_utils import *
 from config import *
-from boltz_types import *
+from sv_types import *
+from boltz_api import *
 
-from api.boltz import *
 
-@boltz_route
-def search() -> Result:
-	payload = fs.request.get_json()
-
-	if not verify_key(["keyword"], payload):
-		return Result(
-			error = Error("'keyword' field is not provided.", status = 500)
-		)
-
+@boltz_route(fields = ["keyword", "search_type"])
+def search(payload: dict) -> Result:
 	boltz = Boltz(CLIENT_ID, CLIENT_SECRET)
-	results = boltz.search_song(payload["keyword"], BoltzSearchTypes.playlist)
+	results = boltz.search_song(payload["keyword"], payload["search_type"])
 
 	if not results:
 		return Result(
-			error = Error(f"Cannot find result with keyword: {payload['keyword']}", status = 404)
+			log = f"Cannot find result with keyword: {payload['keyword']}",
+			status = 404
 		)
 
-	results = [json.dumps(result.to_json()) for result in results]
-	return Result(results)
+	value = {}
+	for i, result in enumerate(results):
+		value.update({i: result.to_json()})
+
+	return Result(data = value)
 

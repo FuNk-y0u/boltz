@@ -1,19 +1,41 @@
 from inc import *
-from boltz_types import *
+from sv_types import *
 
 
 def verify_key(keys: list, json: dict) -> bool:
 	return all(k in json for k in keys)
 
 
-def boltz_route(func: any) -> any:
-	@wraps(func)
+def boltz_route(*args, **kwargs) -> any:
+	# Grabbing the fields
+	fields = []
+	if "fields" in kwargs:
+		fields = kwargs["fields"]
 
-	def decorated(*args, **kwargs) -> fs.Response:
-		res: Result = func(*args, **kwargs)
-		if res.has_value():
-			#TODO: Hard coded for json only response
-			return fs.Response(res.value, status = 200, content_type="application/json")
-		return fs.Response(res.error.log, status = res.error.status)
+	def inner(func):
+		def decorated(*args, **kwargs) -> fs.Response:
 
-	return decorated
+			# Field guard
+			payload = fs.request.get_json()
+			if not verify_key(fields, payload):
+				res = {
+					"data": {},
+					"log": "(" + "|".join(fields) + ") are the required fields.",
+					"status": 500
+				}
+				return fs.Response(
+					json.dumps(res),
+					status = res["status"],
+					content_type = "application/json"
+				)
+
+			# Running the wrapped function
+			res: Result = func(payload, *args, **kwargs)
+			return fs.Response(
+				json.dumps(res.__dict__),
+				status = res.status,
+				content_type = "application/json"
+			)
+
+		return decorated
+	return inner
