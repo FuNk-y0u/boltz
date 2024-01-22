@@ -13,6 +13,7 @@ def boltz_route(*args, **kwargs) -> any:
 		fields = kwargs["fields"]
 
 	def inner(func):
+		@wraps(func)
 		def decorated(*args, **kwargs) -> fs.Response:
 
 			# Field guard
