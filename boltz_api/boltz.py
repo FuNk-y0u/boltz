@@ -174,12 +174,12 @@ class Boltz:
         return _track # Returning BoltzTrack
 
     # * Download and convert tracks
-    def download_track(self, track:BoltzTrack) -> BoltzMP3:
+    def download_track(self, track:BoltzTrack, save_path: str) -> BoltzMP3:
 
         _query = generate_ytdl_query(track.artist, track.name)
 
         _filename = [f"{track.artist} - {track.name}", track.position]
-        _filepath = path.join(self.save_path, _filename[0])
+        _filepath = path.join(save_path, _filename[0])
 
         mp3_filename = f"{_filepath}.mp3"
 

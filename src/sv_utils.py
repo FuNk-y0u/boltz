@@ -6,6 +6,14 @@ def verify_key(keys: list, json: dict) -> bool:
 	return all(k in json for k in keys)
 
 
+def result_to_response(result: Result) -> fs.Response:
+	return fs.Response(
+		json.dumps(result.__dict__),
+		status = result.status,
+		content_type = "application/json"
+	)
+
+
 def boltz_route(*args, **kwargs) -> any:
 	# Grabbing the fields
 	fields = []

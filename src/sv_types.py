@@ -11,3 +11,16 @@ class Result:
 		self.log = log
 		self.status = status
 
+class DownloadStatus:
+	WAITING = "WAITING"
+	DOWNLOADING = "DOWNLOADING"
+	CONVERTING = "CONVERTING"
+	DONE = "DONE"
+	FAILED = "FAILED"
+
+@dataclass
+class DownloadProgress:
+	id: str
+	name: str
+	status: DownloadStatus
+
