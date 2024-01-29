@@ -7,3 +7,4 @@ src/routes/__pycache__/
 boltz_api/__pycache__/
 .env
 /downloads/
+/instance/

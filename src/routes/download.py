@@ -1,5 +1,6 @@
 from sv_inc import *
 from sv_utils import *
+from sv_models import *
 from config import *
 from sv_types import *
 from boltz_api import *
@@ -12,6 +13,12 @@ def download_thread(
 	path: str
 ):
 	with app.app_context():
+		# Check if already exists in db
+		pl = DBTrackEntry.query.filter_by(id = id).first()
+		if pl:
+			fs.current_app.config[DOWNLOAD_PROGRESS][id]["status"] = DownloadStatus.DONE
+			return
+
 		for i, track in enumerate(tracks):
 			progress = fs.current_app.config[DOWNLOAD_PROGRESS][id]["tracks"][i]
 
@@ -32,6 +39,18 @@ def download_thread(
 
 		fs.current_app.config[DOWNLOAD_PROGRESS][id]["status"] = DownloadStatus.DONE
 		shutil.make_archive(path, "zip", path)
+		size = os.path.getsize(path + ".zip")
+
+		# TODO: Add deletion of old tracks when memory is full
+
+		# Appending in database
+		new_track = DBTrackEntry(
+			id = id,
+			downloads = 0,
+			size = size
+		)
+		pdb.session.add(new_track)
+		pdb.session.commit()
 
 
 @boltz_route(fields = ["url"])
@@ -94,21 +113,19 @@ def get_status(payload: dict) -> Result:
 	)
 
 def get_file(pl_id: str) -> fs.Response:
-	#NOTE: Cannot refetch the same file again cuz pl_id is removed from progess pool
-	if pl_id not in fs.current_app.config[DOWNLOAD_PROGRESS]:
+	pl = DBTrackEntry.query.filter_by(id = pl_id).first()
+	if not pl:
 		return result_to_response(Result(
-			log = f"Cannot find download progress for pl_id: {pl_id}",
+			log = f"Cannot find playlist of id: {pl_id} in database",
 			status = 500
 		))
 
-	progress = fs.current_app.config[DOWNLOAD_PROGRESS][pl_id]
-	if progress["status"] != DownloadStatus.DONE:
-		return result_to_response(Result(
-			log = f"Download is not completed for pl_id: {pl_id}",
-			status = 500
-		))
+	pl.downloads += 1
+	pdb.session.add(pl)
+	pdb.session.commit()
 
-	fs.current_app.config[DOWNLOAD_PROGRESS].pop(pl_id)
+	if pl_id in fs.current_app.config[DOWNLOAD_PROGRESS]:
+		fs.current_app.config[DOWNLOAD_PROGRESS].pop(pl_id)
 
 	#NOTE: HARD CODED TO ONE DIRECTORY BACK (BE CAREFUL!!)
 	return fs.send_file(".." + "/" + DOWNLOAD_ROOT + pl_id + ".zip")
