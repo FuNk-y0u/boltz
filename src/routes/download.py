@@ -38,10 +38,30 @@ def download_thread(
 			fs.current_app.config[DOWNLOAD_PROGRESS][id]["tracks"][i] = progress
 
 		fs.current_app.config[DOWNLOAD_PROGRESS][id]["status"] = DownloadStatus.DONE
+
+		# Generating zip and deleting the directory
 		shutil.make_archive(path, "zip", path)
 		size = os.path.getsize(path + ".zip")
+		shutil.rmtree(path)
 
-		# TODO: Add deletion of old tracks when memory is full
+		# NOTE: This way doesnt check whether the currently downloaded file is less than max download size
+		# Deleting old tracks when memory is full
+		db_tracks = DBTrackEntry.query.all()
+		db_size = 0
+		for track in db_tracks:
+			db_size += track.size
+
+		while db_size > MAX_DOWNLOAD_SIZE:
+			least_dl_track = DBTrackEntry.query.order_by(DBTrackEntry.downloads).first()
+			print(f"db_size: {db_size}, Deleting: {least_dl_track}")
+			os.remove(DOWNLOAD_ROOT + least_dl_track.id + ".zip")
+			pdb.session.delete(least_dl_track)
+			pdb.session.commit()
+
+			db_tracks = DBTrackEntry.query.all()
+			db_size = 0
+			for track in db_tracks:
+				db_size += track.size
 
 		# Appending in database
 		new_track = DBTrackEntry(
