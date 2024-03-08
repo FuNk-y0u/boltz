@@ -46,7 +46,7 @@ class BoltzAlbum:
 
 @dataclass
 class BoltzTrack:
-	id:int
+	id:str
 	name:str
 	position:int
 	album:BoltzAlbum

@@ -11,31 +11,35 @@ def download_thread(
 	path: str
 ):
 	with app.app_context():
+		pm = fs.current_app.config[PROGRESS_MANAGER]
+
 		# Check if already exists in db
 		pl = DBTrackEntry.query.filter_by(id = id).first()
 		if pl:
-			fs.current_app.config[DOWNLOAD_PROGRESS][id]["status"] = DownloadStatus.DONE
+			progress: DownloadProgrss = pm.get(id)
+			progress.status = DownloadStatus.DONE
 			return
 
-		for i, track in enumerate(tracks):
-			progress = fs.current_app.config[DOWNLOAD_PROGRESS][id]["tracks"][i]
+		for track in tracks:
+			track_progress = pm.get(id).tracks[track.id]
+			track_progress["status"] = DownloadStatus.DOWNLOADING
 
-			progress["status"] = DownloadStatus.DOWNLOADING
 			mp3 = boltz.download_track(track, path)
 			if not mp3.is_valid:
-				progress["status"] = DownloadStatus.FAILED
+				track_progress["status"] = DownloadStatus.FAILED
 				continue
 
-			progress["status"] = DownloadStatus.CONVERTING
+			track_progress["status"] = DownloadStatus.CONVERTING
 			if not boltz.set_tags(mp3, len(tracks)):
-				progress["status"] = DownloadStatus.FAILED
+				track_progress["status"] = DownloadStatus.FAILED
 				continue
 
-			progress["status"] = DownloadStatus.DONE
+			track_progress["status"] = DownloadStatus.DONE
 
-			fs.current_app.config[DOWNLOAD_PROGRESS][id]["tracks"][i] = progress
+			tracks = pm.get(id).tracks
+			tracks[track.id] = track_progress
 
-		fs.current_app.config[DOWNLOAD_PROGRESS][id]["status"] = DownloadStatus.DONE
+		pm.get(id).status = DownloadStatus.DONE
 
 		# Generating zip and deleting the directory
 		shutil.make_archive(path, "zip", path)
@@ -88,26 +92,22 @@ def download(payload: dict) -> Result:
 		)
 
 	# Appending download progress
-	download_progress = {
-		"status": DownloadStatus.DOWNLOADING,
-		"tracks": []
-	}
-	for track in tracks:
-		progress = DownloadProgress(track.id, track.name, DownloadStatus.WAITING)
-		download_progress["tracks"].append(progress.__dict__)
+	pm = fs.current_app.config[PROGRESS_MANAGER]
+	if not pm.exists(url.id):
+		progress = DownloadProgress(url.id)
+		for track in tracks:
+			progress.append_track(track)
 
-	fs.current_app.config[DOWNLOAD_PROGRESS].update({
-		url.id: download_progress
-	})
+		pm.append(progress)
 
-	# Starting download
-	threading.Thread(
-		target = download_thread, args = (
-			fs.current_app.config["APP"],
-			boltz, url.id,
-			tracks, download_path
-		)
-	).start()
+		# Starting download
+		threading.Thread(
+			target = download_thread, args = (
+				fs.current_app.config["APP"],
+				boltz, url.id,
+				tracks, download_path
+			)
+		).start()
 
 	return Result(
 		data = { "pl_id": url.id },
@@ -118,15 +118,19 @@ def download(payload: dict) -> Result:
 @boltz_route(fields = ["pl_id"])
 def get_status(payload: dict) -> Result:
 	pl_id = payload["pl_id"]
-	if pl_id not in fs.current_app.config[DOWNLOAD_PROGRESS]:
+	#if pl_id not in pm:
+	# if not pm.exists(pl_id):
+
+	# progress = pm[pl_id]
+	progress = fs.current_app.config[PROGRESS_MANAGER].get(pl_id)
+	if not progress:
 		return Result(
 			log = f"Cannot find download progress for pl_id: {pl_id}",
 			status = 500
 		)
 
-	progress = fs.current_app.config[DOWNLOAD_PROGRESS][pl_id]
 	return Result(
-		data = progress,
+		data = progress.to_dict(),
 		log = f"Progress for pl_id: {pl_id}"
 	)
 
@@ -142,8 +146,10 @@ def get_file(pl_id: str) -> fs.Response:
 	pdb.session.add(pl)
 	pdb.session.commit()
 
-	if pl_id in fs.current_app.config[DOWNLOAD_PROGRESS]:
-		fs.current_app.config[DOWNLOAD_PROGRESS].pop(pl_id)
+	fs.current_app.config[PROGRESS_MANAGER].pop(pl_id)
+
+	# if pl_id in pm:
+	# 	pm.pop(pl_id)
 
 	#NOTE: HARD CODED TO ONE DIRECTORY BACK (BE CAREFUL!!)
 	return fs.send_file(".." + "/" + DOWNLOAD_ROOT + pl_id + ".zip")
