@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.13.1
+  marquee: ^2.2.3
 
 dev_dependencies:
   flutter_test:

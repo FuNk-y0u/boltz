@@ -1,4 +1,6 @@
+import 'package:boltz/data/player_controller_model.dart';
 import 'package:boltz/domain/pages_service.dart';
+import 'package:boltz/layout/boltz_bottom_mini_player.dart';
 import 'package:boltz/layout/boltz_navigation_bar.dart';
 import 'package:boltz/providers/page_provider.dart';
 import 'package:boltz/themes/dark_theme.dart';
@@ -18,6 +20,7 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   int currentPageIndex = 0;
+  BoltzPlayerController _playerController = BoltzPlayerController();
 
   void setCurrentPageIndex(int index) {
     setState(() {
@@ -33,7 +36,19 @@ class _MainAppState extends State<MainApp> {
       home: Scaffold(
         bottomNavigationBar:
             BoltzNavBar(setCurrentPageIndex, pages, currentPageIndex),
-        body: getCurrentPage(currentPageIndex),
+        body: Stack(children: [
+          getCurrentPage(currentPageIndex),
+          BoltzBottomMiniPlayer(
+              context: context,
+              controller: _playerController,
+              onPlay: () {
+                setState(() {
+                  _playerController.isPlaying = !_playerController.isPlaying;
+                });
+              },
+              onSkipBackward: () => print("Skipping back"),
+              onSkipForward: () => print("Skipping forward")),
+        ]),
       ),
     );
   }
