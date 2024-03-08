@@ -1,5 +1,5 @@
-from inc import *
-from sv_types import *
+from .sv_inc import *
+from .sv_types import *
 
 
 def verify_key(keys: list, json: dict) -> bool:

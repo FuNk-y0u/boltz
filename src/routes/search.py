@@ -1,8 +1,6 @@
-from sv_inc import *
 from sv_utils import *
 from config import *
-from sv_types import *
-from boltz_api import *
+from api import *
 
 
 @boltz_route(fields = ["keyword", "search_type"])

@@ -1,9 +1,6 @@
 import sys
 import os
-
-path = os.getcwd() + "/src"
-sys.path.append(path)
-path = os.getcwd() + "/boltz_api"
-sys.path.append(path)
+sys.path.append(os.getcwd() + "/src")
+sys.path.append(os.getcwd() + "/src/api")
 
 import src.main

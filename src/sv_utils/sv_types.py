@@ -1,4 +1,4 @@
-from sv_inc import *
+from .sv_inc import *
 
 class Result:
 	def __init__(

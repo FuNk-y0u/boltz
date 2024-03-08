@@ -1,5 +1,3 @@
-from sv_inc    import *
-from sv_models import *
 from config    import *
 from routes    import *
 

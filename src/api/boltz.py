@@ -4,6 +4,7 @@
 
 from inc import *
 
+
 class Boltz:
 
     # * Constructor

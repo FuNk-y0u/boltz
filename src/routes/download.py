@@ -1,9 +1,7 @@
-from sv_inc import *
 from sv_utils import *
 from sv_models import *
 from config import *
-from sv_types import *
-from boltz_api import *
+from api import *
 
 def download_thread(
 	app: fs.Flask,
