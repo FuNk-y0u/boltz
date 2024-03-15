@@ -1,10 +1,11 @@
-mod boltz;
+mod api;
+
+use api::boltz::Boltz;
 
 use std::process::exit;
+use std::fs;
 use dotenv::dotenv;
-use actix_web::{get, HttpServer, App, HttpResponse, middleware::Logger};
-
-use boltz::boltz::Boltz;
+use actix_web::{ get, HttpServer, App, HttpResponse, middleware::Logger };
 
 #[get("/")]
 async fn index() -> HttpResponse {
@@ -22,6 +23,7 @@ async fn main() -> std::io::Result<()> {
 
 	env_logger::init();
 
+	// Loading env variables
 	let server_ip = std::env::var("SERVER_IP")
 		.expect("SERVER_IP environment variable needs to be set.");
 	let server_port = std::env::var("SERVER_PORT")
@@ -32,16 +34,27 @@ async fn main() -> std::io::Result<()> {
 		.expect("CLIENT_ID environment variable needs to be set.");
 	let client_secret = std::env::var("CLIENT_SECRET")
 		.expect("CLIENT_SECRET environment variable needs to be set.");
+	let download_path = std::env::var("DOWNLOAD_PATH")
+		.expect("DOWNLOAD_PATH environment variable needs to be set.");
+
+	// Creating download directory
+	let _ = fs::create_dir(&download_path);
 
 	// Initializing boltz
-	let boltz = Boltz::new(&client_id, &client_secret)
+	let boltz = Boltz::new(&client_id, &client_secret, download_path)
 		.await
 		.unwrap_or_else(move |err| {
 			eprintln!("Failed to initialize boltz: {}", err);
 			exit(1);
 		});
 
-	println!("{:#?}", boltz.token);
+	let pl = boltz.fetch_playlist("7iKCwhsXfOPv2IMfeZLj4z").await.unwrap();
+	for item in &pl.tracks.items {
+		let file_name = boltz.download_track(&item.track).await.unwrap();
+		boltz.set_mp3_tags_to_track(&file_name, &item.track).await.unwrap();
+	}
+
+	println!("{:#?}", pl);
 
 	HttpServer::new( move || {
 		App::new()
