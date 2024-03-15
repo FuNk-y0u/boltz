@@ -9,3 +9,8 @@ src/api/__pycache__/
 .env
 /downloads/
 /instance/
+
+
+# Added by cargo
+
+/target
