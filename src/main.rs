@@ -1,11 +1,14 @@
 mod api;
+mod routes;
 
 use api::boltz::Boltz;
+use routes::download::download;
 
 use std::process::exit;
 use std::fs;
+use std::sync::Mutex;
 use dotenv::dotenv;
-use actix_web::{ get, HttpServer, App, HttpResponse, middleware::Logger };
+use actix_web::{ get, web, HttpServer, App, HttpResponse, middleware::Logger };
 
 #[get("/")]
 async fn index() -> HttpResponse {
@@ -47,19 +50,14 @@ async fn main() -> std::io::Result<()> {
 			eprintln!("Failed to initialize boltz: {}", err);
 			exit(1);
 		});
-
-	let pl = boltz.fetch_playlist("7iKCwhsXfOPv2IMfeZLj4z").await.unwrap();
-	for item in &pl.tracks.items {
-		let file_name = boltz.download_track(&item.track).await.unwrap();
-		boltz.set_mp3_tags_to_track(&file_name, &item.track).await.unwrap();
-	}
-
-	println!("{:#?}", pl);
+	let data = web::Data::new(Mutex::new(boltz));
 
 	HttpServer::new( move || {
 		App::new()
 			.wrap(Logger::default())
+			.app_data(data.clone())
 			.service(index)
+			.service(download)
 	})
 		.bind((server_ip, server_port))?
 		.run()

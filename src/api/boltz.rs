@@ -1,12 +1,12 @@
 use std::result::Result;
-use reqwest::Client;
+use reqwest::{ Client, StatusCode };
 use youtube_dl::{ YoutubeDl, SearchOptions };
 use id3::{ Tag, TagLike, Timestamp, Version, frame::{ Picture, PictureType } };
 use std::time::SystemTime;
 use std::str::FromStr;
 
 use super::boltz_model::{ AccessToken, Playlist, Track };
-use super::boltz_error::Error;
+use super::boltz_error::{ Error, SpotifyError };
 
 // TODO: Maybe take api url as a param to the boltz constructor
 const API_URL: &str = "https://api.spotify.com/v1";
@@ -15,6 +15,8 @@ pub struct Boltz {
 	pub rq_client: Client,
 	pub token: AccessToken,
 	pub download_path: String,
+	pub client_id: String,
+	pub client_secret: String
 }
 
 impl Boltz {
@@ -24,7 +26,9 @@ impl Boltz {
 		Ok(Boltz {
 			rq_client: rq_client,
 			token: token,
-			download_path: download_path
+			download_path: download_path,
+			client_id: client_id.to_string(),
+			client_secret: client_secret.to_string()
 		})
 	}
 
@@ -56,18 +60,42 @@ impl Boltz {
 		Ok(token)
 	}
 
-	pub async fn fetch_playlist(&self, playlist_id: &str) -> Result<Playlist, Error> {
-		let playlist = self.rq_client
+	// TODO: Implement auto token generator
+	pub async fn fetch_playlist(&mut self, playlist_id: &str) -> Result<Playlist, Error> {
+
+		// Check if the token has expired or not
+		let now = SystemTime::now()
+			.duration_since(SystemTime::UNIX_EPOCH)
+			.unwrap()
+			.as_secs();
+
+		if Some(now) >= self.token.expires_at {
+			self.token = Self::fetch_token(&self.rq_client, &self.client_id, &self.client_secret)
+				.await?;
+		}
+
+		let response = self.rq_client
 			.get(format!("{API_URL}/playlists/{playlist_id}"))
 			.header("Authorization", format!(
 				"{} {}", self.token.token_type, self.token.access_token
 			))
 			.send()
-			.await?
-			.json::<Playlist>()
 			.await?;
 
-		Ok(playlist)
+		if response.status() == StatusCode::OK {
+			let playlist = response
+				.json::<Playlist>()
+				.await?;
+
+			return Ok(playlist);
+		}
+
+		let s_err = response
+			.json::<SpotifyError>()
+			.await?;
+
+		// TODO: Handle the unwrap properly
+		Err(Error::Web(StatusCode::from_u16(s_err.error.status).unwrap(), s_err.error.message))
 	}
 
 	pub async fn download_track(&self, track: &Track) -> Result<String, Error> {
